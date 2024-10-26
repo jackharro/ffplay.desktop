@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=FFplay (Icon files)
+GenericeName=Icon (ico) viewer
+Comment=View icon files with FFplay
+
+Icon=org.ffmpeg.FFmpeg
+TryExec=ffplay-ico-wrapper
+MimeType=image/vnd.microsoft.icon
+NoDisplay=True

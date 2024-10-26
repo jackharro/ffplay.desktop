@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Repeat for each line in ffprobe begininning with \s*?Stream
+# 1. ffprobe: Stream #0:0: Video: bmp, bgra, 16x16, 90k tbr, 90k tbn
+# 2. Parse table with delimiters : and ,
+#       • ffprobeStream
+# 2. Parse with ': ' delimiter
+#       Stream #<file_index>:<stream_index>Video<expect bmp>, idk, <image_size>, …
+#       $stream_specifier_raw$_$info_list
+# 3. Then parse $info_list
+#       bmpbgra16x1690k tbr90k tbn
+#               • So we want the third one: $image_size
+
+# #0 Since we only expect one input file
+pat='Stream.#0:'
+# Digits until next colon is the stream index 
+pat="$pat"'([0-9]+):.Video: '
+# Ignore everything until [0-9]x[0-9]. This is the size of the thing.
+pat="$pat"'.*,.([0-9]+x[0-9]+),.*$'
+
+expected_ffprobe_output="$pat"
+
+ffprobe "$1" 2>&1 | while read -r line; do
+    if [[ "$line" =~ $expected_ffprobe_output ]] ; then
+        stream_index=${BASH_REMATCH[1]}
+        area=$(( $(echo ${BASH_REMATCH[2]} | tr 'x' '*') ))
+
+        # Now, we make an array [ area, stream ]
+        # And put it in another array:
+        # stream_info_pairs.append([ area, stream ])
+    fi
+    # find_biggest_icon_from(stream_info_pairs) -> usize: target_stream
+    # ffplay "$1" -vst $target_stream
+done
